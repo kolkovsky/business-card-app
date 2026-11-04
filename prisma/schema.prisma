@@ -1,0 +1,91 @@
+// Data model of the digital business card.
+// Every child entity belongs to a Profile (one-to-many, cascade delete).
+// Natural composite unique keys make the seed idempotent (upsert by key)
+// and, because they start with the parent FK, double as lookup indexes
+// for batched loading (WHERE "profileId" IN (...)).
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id          Int          @id @default(autoincrement())
+  slug        String       @unique
+  name        String
+  headline    String
+  description String
+  location    String?
+  email       String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  links       Link[]
+  skills      Skill[]
+  experience  Experience[]
+  projects    Project[]
+}
+
+model Link {
+  id        Int     @id @default(autoincrement())
+  profileId Int
+  label     String
+  url       String
+  sortOrder Int     @default(0)
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, label])
+}
+
+model Skill {
+  id        Int     @id @default(autoincrement())
+  profileId Int
+  name      String
+  category  String?
+  sortOrder Int     @default(0)
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, name])
+}
+
+model Experience {
+  id           Int           @id @default(autoincrement())
+  profileId    Int
+  company      String
+  position     String
+  location     String?
+  startDate    DateTime      @db.Date
+  // null means "present"
+  endDate      DateTime?     @db.Date
+  sortOrder    Int           @default(0)
+  profile      Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  achievements Achievement[]
+
+  @@unique([profileId, company, startDate])
+}
+
+model Achievement {
+  id           Int        @id @default(autoincrement())
+  experienceId Int
+  text         String
+  sortOrder    Int        @default(0)
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+
+  @@unique([experienceId, sortOrder])
+}
+
+model Project {
+  id          Int     @id @default(autoincrement())
+  profileId   Int
+  name        String
+  description String?
+  url         String
+  sortOrder   Int     @default(0)
+  profile     Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, name])
+}

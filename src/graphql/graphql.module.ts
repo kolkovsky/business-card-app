@@ -23,9 +23,10 @@ import type { GqlContext } from './graphql-context';
       ): ApolloDriverConfig => ({
         // Code-first: schema is generated from TS classes. In development it is
         // also written to schema.gql (committed as the API contract).
-        autoSchemaFile: config.isProduction
-          ? true
-          : join(process.cwd(), 'schema.gql'),
+        autoSchemaFile:
+          config.nodeEnv === 'development'
+            ? join(process.cwd(), 'schema.gql')
+            : true,
         sortSchema: true,
         // Apollo Sandbox instead of the deprecated GraphQL Playground,
         // enabled in every environment as the assignment requires.

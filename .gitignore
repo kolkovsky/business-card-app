@@ -18,5 +18,3 @@ npm-debug.log*
 .vscode/*
 !.vscode/extensions.json
 
-# generated
-schema.gql

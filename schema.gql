@@ -1,0 +1,81 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Achievement {
+  id: ID!
+  text: String!
+}
+
+"""Work experience entry"""
+type Experience {
+  achievements: [Achievement!]!
+  company: String!
+
+  """null for the current position"""
+  endDate: LocalDate
+  id: ID!
+
+  """True if the person still works here"""
+  isCurrent: Boolean!
+  location: String
+  position: String!
+  startDate: LocalDate!
+}
+
+"""Professional resource: GitHub, LinkedIn, etc."""
+type Link {
+  id: ID!
+
+  """
+  Human readable name, e.g. "GitHub"
+  """
+  label: String!
+  url: String!
+}
+
+"""Calendar date without time, ISO 8601 (YYYY-MM-DD)"""
+scalar LocalDate
+
+"""Developer business card"""
+type Profile {
+  """Short description / summary"""
+  description: String!
+  email: String
+  experience: [Experience!]!
+
+  """Short professional title"""
+  headline: String!
+  id: ID!
+  links: [Link!]!
+  location: String
+  name: String!
+  projects: [Project!]!
+  skills: [Skill!]!
+
+  """URL-friendly unique identifier"""
+  slug: String!
+}
+
+type Project {
+  description: String
+  id: ID!
+  name: String!
+
+  """Link to the project or its repository"""
+  url: String!
+}
+
+type Query {
+  """Business card profile. Without slug returns the owner."""
+  profile(slug: String): Profile!
+}
+
+type Skill {
+  """
+  Grouping such as "Languages" or "Backend"
+  """
+  category: String
+  id: ID!
+  name: String!
+}

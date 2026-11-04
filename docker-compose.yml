@@ -16,5 +16,19 @@ services:
       timeout: 3s
       retries: 30
 
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/business_card?schema=public
+      LOG_SQL: ${LOG_SQL:-false}
+    ports:
+      - '3000:3000'
+
 volumes:
   pgdata:

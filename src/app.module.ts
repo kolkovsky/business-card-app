@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { RequestLoggerMiddleware } from './common/request-logger.middleware';
 import { AppConfigModule } from './config/config.module';
 import { ExperienceModule } from './experience/experience.module';
 import { AppGraphQLModule } from './graphql/graphql.module';
@@ -16,4 +17,12 @@ import { ProfileModule } from './profile/profile.module';
     ExperienceModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    // Health checks fire every few seconds and would drown out real traffic
+    consumer
+      .apply(RequestLoggerMiddleware)
+      .exclude('health')
+      .forRoutes('{*splat}');
+  }
+}

@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import type { App } from 'supertest/types';
@@ -134,6 +134,22 @@ describe('GraphQL profile (e2e)', () => {
     const { errors } = await gql(`{ profile(slug: "missing") { name } }`);
 
     expect(errors?.[0].extensions?.code).toBe('NOT_FOUND');
+  });
+
+  it('logs the client IP of GraphQL requests but not of health checks', async () => {
+    const log = jest.spyOn(Logger.prototype, 'log').mockImplementation();
+    const server = app.getHttpServer();
+
+    await request(server).post('/graphql').send({ query: '{ __typename }' });
+    await request(server).get('/health').expect(200);
+    await new Promise((resolve) => setImmediate(resolve));
+
+    const lines = log.mock.calls.map(([message]) => String(message));
+    log.mockRestore();
+
+    expect(lines).toEqual([
+      expect.stringMatching(/^POST \/graphql 200 \d+ms ip=\S+$/),
+    ]);
   });
 
   describe('N+1 guard', () => {

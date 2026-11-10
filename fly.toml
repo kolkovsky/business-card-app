@@ -1,0 +1,30 @@
+# Replace the app name if it is already taken on Fly.io.
+# DATABASE_URL is set as a secret by `fly postgres attach`.
+app = "user-business-card"
+primary_region = "ams"
+
+[build]
+
+[env]
+  PORT = "8080"
+  TRUST_PROXY_HOPS = "1"
+
+# The machine stays on so that the first request does not wait for a cold start.
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  # Migrations and seed run before the server starts, hence the long grace period.
+  [[http_service.checks]]
+    grace_period = "60s"
+    interval = "30s"
+    timeout = "5s"
+    method = "GET"
+    path = "/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

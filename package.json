@@ -2,7 +2,6 @@
   "name": "digital-business-card",
   "version": "0.0.1",
   "description": "Digital business card backend: NestJS + GraphQL + Prisma + PostgreSQL",
-  "author": "Stas Kolkovsky",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

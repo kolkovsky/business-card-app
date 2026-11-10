@@ -30,4 +30,8 @@ export class AppConfigService {
   get logSql(): boolean {
     return this.config.get('LOG_SQL', { infer: true });
   }
+
+  get trustProxyHops(): number {
+    return this.config.get('TRUST_PROXY_HOPS', { infer: true });
+  }
 }

@@ -10,6 +10,7 @@ describe('validateEnv', () => {
       DATABASE_URL,
       GRAPHQL_MAX_DEPTH: 6,
       LOG_SQL: false,
+      TRUST_PROXY_HOPS: 0,
     });
   });
 
